@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>To-Do List</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <style>
+    body {
+  background-color: rgba(237, 0, 162, 0.5);
+  min-height: 70vh;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  text-align: center;
+  font-size: 130%;
+}
+
+@media only screen and (min-width: 500px) {
+  body {
+    min-height: 100vh;
+  }
+}
+.container {
+  width: 100%;
+  height: auto;
+  min-height: 500px;
+  max-width: 500px;
+  min-width: 250px;
+  background: #cc4ea8f4;
+  background-size: 25px 25px;
+  border-radius: 2px;
+  box-shadow: 4px 4px 7px 4xpx #000000e7;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.heading__title {
+  transform: rotate(2deg);
+  padding: 0.2rem 1.2rem;
+  border-radius: 5% 20% 5% 20%/20% 5% 20% 5%;
+  background-color: rgba(170, 25, 141, 0.731);
+  font-size: 1.5rem;
+}
+.heading__title:hover{
+   transform: rotate(180deg);
+
+}
+
+@media only screen and (min-width: 500px) {
+  .heading__title {
+    font-size: 2rem;
+  }
+}
+.heading__img {
+  width: 24%;
+}
+
+.form__label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form__input {
+  box-sizing: border-box;
+  background-color: transparent;
+  padding: 0.7rem;
+  border-bottom-right-radius: 10px 2px;
+  border-bottom-left-radius: 2px 10px;
+  border: solid 1px transparent;
+  border-bottom: double 5px #ea95e0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.998);
+  width: 70%;
+  margin-bottom: 20px;
+}
+.form__input:focus {
+  outline: none;
+  border: solid 2px #ea95e0;
+}
+
+@media only screen and (min-width: 500px) {
+  .form__input {
+    width: 60%;
+  }
+}
+.button {
+  padding: 0;
+  border: none;
+  transform: rotate(4deg);
+  transform-origin: center;
+  text-decoration: none;
+  padding-bottom: 3px;
+  border-radius: 50% ;
+  box-shadow: 0 2px 0 #df18dfdc;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background-image: url("todo.jpg");
+}
+
+.button span {
+  background: #f1f5f8;
+  display: block;
+  padding: 0.5rem 1rem;
+  border-radius: 50%;
+  border: 2px solid #e840cc;
+}
+
+.button:active, .button:focus {
+  transform: translateY(4px);
+  padding-bottom: 0px;
+  outline: 0;
+}
+
+.toDoList {
+  text-align: left;
+}
+.toDoList li {
+  position: relative;
+  padding: 0.5rem;
+  list-style-type: number;
+}
+.toDoList li:hover {
+  text-decoration: line-through solid #121314;
+}
+
+/* style for timer  */
+
+.Timer{
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 40px;
+}
+#time{
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border-radius: 50%;
+        }
+        
+    </style>
+  </head>
+  <body>
+    <section class="container">
+      <div class="heading">
+        <img class="heading__img" src="todo.jpg">
+        <h1 class="heading__title">Rok-Do</h1>
+      </div>
+      <form class="form">
+        <div>
+          <div class="Timer">
+            <button id="time" class="hour">00</button>Hrs
+            <button id="time" class="mins">00</button>Mins
+            <button id="time" class="sec">00</button>Sec
+            </div>
+          <label class="form__label" for="todo">📌TODOS ⬇ </label>
+          <input class="form__input"
+               type="text"
+               id="todo"
+               name="to-do"
+               size="30"
+               required>
+          <button class="button"><span><strong>Add +</strong></span></button>
+        </div>
+      </form>
+      <div>
+        <ul class="toDoList">
+        </ul>
+      </div>
+    </section>
+    <script>
+        // IEFE
+(() => {
+  // state variables
+  let toDoListArray = [];
+  // ui variables
+  const form = document.querySelector(".form");
+  const input = form.querySelector(".form__input");
+  const ul = document.querySelector(".toDoList");
+
+  // event listeners
+  form.addEventListener('submit', e => {
+    // prevent default behaviour - Page reload
+    e.preventDefault();
+    // give item a unique ID
+    let itemId = String(Date.now());
+    // get/assign input value
+    let toDoItem = input.value;
+    //pass ID and item into functions
+    addItemToDOM(itemId , toDoItem);
+    addItemToArray(itemId, toDoItem);
+    // clear the input box. (this is default behaviour but we got rid of that)
+    input.value = '';
+  });
+
+  ul.addEventListener('click', e => {
+    let id = e.target.getAttribute('data-id')
+    if (!id) return // user clicked in something else
+    //pass id through to functions
+    removeItemFromDOM(id);
+    removeItemFromArray(id);
+  });
+
+  // functions
+  function addItemToDOM(itemId, toDoItem) {
+    // create an li
+    const li = document.createElement('li')
+    li.setAttribute("data-id", itemId);
+    // add toDoItem text to li
+    li.innerText = toDoItem
+    // add li to the DOM
+    ul.appendChild(li);
+  }
+
+  function addItemToArray(itemId, toDoItem) {
+    // add item to array as an object with an ID so we can find and delete it later
+    toDoListArray.push({ itemId, toDoItem});
+    console.log(toDoListArray)
+  }
+
+  function removeItemFromDOM(id) {
+    // get the list item by data ID
+    var li = document.querySelector('[data-id="' + id + '"]');
+    // remove list item
+    ul.removeChild(li);
+  }
+
+  function removeItemFromArray(id) {
+    // create a new toDoListArray with all li's that don't match the ID
+    toDoListArray = toDoListArray.filter(item => item.itemId !== id);
+    console.log(toDoListArray);
+  }
+
+})();
+
+// script file for timer
+
+const now = new Date();
+    let hr = now.getHours();
+    let ms = now.getMinutes();
+    let sc = now.getSeconds();
+   
+    const hours = document.querySelector('.hour');
+    const minutes = document.querySelector('.mins');
+    const seconds = document.querySelector('.sec');
+
+setInterval(function(){
+    const now = new Date();
+    let hr = now.getHours();
+    let ms = now.getMinutes();
+    let sc = now.getSeconds(); 
+
+    hours.innerHTML = `${hr}`; 
+    minutes.innerHTML = `${ms}`;
+    seconds.innerHTML = `${sc}`
+    },1000);
+    </script>
+  </body>
+</html>
